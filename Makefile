@@ -1,10 +1,14 @@
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
-PYTHON_DEPS := docopt pyspark pyyaml yamllint
+PYTHON_DEPS := docopt pyspark pyyaml yamllint yapf flake8 ipdb
 
 install:
 	pipenv run pip install c7n c7n-org $(PYTHON_DEPS)
+
+format:  ## Auto-format and check pep8
+	pipenv run yapf -i $$(find * -type f -name '*.py')
+	pipenv run flake8 $$(find * -type f -name '*.py)')
 
 aws-regions: aws-regions.txt  ## Create a list of aws-regions
 aws-regions.txt:
