@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+set -x
+
+docker-compose exec spark-client ./bin/spark-submit \
+  --master ${SPARK_MASTER_URL} \
+  --conf spark.executor.cores=${SPARK_EXECUTOR_CORES} \
+  --conf spark.executor.memory=${SPARK_EXECUTOR_MEMORY} \
+  --conf spark.driver.memory=${SPARK_DRIVER_MEMORY} \
+  "${@}"
+
+# --packages net.snowflake:snowflake-jdbc:3.12.12,net.snowflake:spark-snowflake_2.12:2.8.2-spark_3.0,org.elasticsearch:elasticsearch-spark-30_2.12:7.15.0 \

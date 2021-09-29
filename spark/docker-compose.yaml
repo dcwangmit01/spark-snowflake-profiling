@@ -1,0 +1,52 @@
+# based on: https://github.com/bitnami/bitnami-docker-spark/blob/master/docker-compose.yml
+version: '3'
+
+services:
+  spark-master:
+    image: docker.io/bitnami/spark:3-debian-10
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    ports:
+      - '8080:8080'
+    volumes:
+      - "${PWD}/dfs:/opt/bitnami/spark/dfs"
+  spark-worker:
+    image: docker.io/bitnami/spark:3-debian-10
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=${SPARK_WORKER_MEMORY}
+      - SPARK_WORKER_CORES=${SPARK_WORKER_CORES}
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    ports:
+      - '8082-8099:4040'
+    volumes:
+      - "${PWD}/dfs:/opt/bitnami/spark/dfs"
+    deploy:
+      replicas: ${SPARK_WORKER_REPLICAS}
+  spark-client:
+    user: root
+    image: docker.io/bitnami/spark:3-debian-10
+    entrypoint:
+      - sleep
+      - infinity
+    ports:
+      - '8081:4040'
+    volumes:
+      - "${PWD}/dfs:/opt/bitnami/spark/dfs"
+    environment:
+      - AWS_PROFILE
+      - SNOWFLAKE_USERNAME
+      - SNOWFLAKE_PASSWORD
+      - SNOWFLAKE_DATABASE
+      - SNOWFLAKE_ROLE
+      - SNOWFLAKE_SCHEMA
+      - SNOWFLAKE_URL
+      - SNOWFLAKE_WAREHOUSE
