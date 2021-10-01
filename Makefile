@@ -59,8 +59,38 @@ cc-spark:  ## Run Spark to process the program outputs
 	    --packages org.elasticsearch:elasticsearch-spark-30_2.12:7.15.0 \
 	    $${SPARK_HOME}/dfs/$$MODULE/run.py \
 	    $${SPARK_HOME}/dfs/$$MODULE/config.yaml \
-            $${SPARK_HOME}/dfs/$$MODULE/out)
-	rm -rf ./spark/dfs/$$MODULE
+            $${SPARK_HOME}/dfs/$$MODULE/out \
+        )
+
+.PHONY: snowflake-poc-1-seq
+snowflake-poc-1-seq:  ## Run snowflake-poc-1 in Sequence
+	MODULE=snowflake-poc-1 && \
+	  rm -rf ./spark/dfs/$$MODULE && cp -r $$MODULE ./spark/dfs && \
+	  cp config.yaml ./spark/dfs/$$MODULE && \
+	(source ./snowflake-poc-1/.envrc && cd spark && source .envrc \
+	  docker-compose exec spark-client pip3 install $(PYTHON_DEPS) && \
+	  time ./docker-spark-submit \
+	    --packages net.snowflake:snowflake-jdbc:3.12.12,net.snowflake:spark-snowflake_2.12:2.8.2-spark_3.0 \
+	    $${SPARK_HOME}/dfs/$$MODULE/sfq-job.py \
+	    --debug --sleep=600 \
+	    $${SPARK_HOME}/dfs/$$MODULE/output.tsv \
+	    "select * from $${SNOWFLAKE_DATABASE}.$${SNOWFLAKE_SCHEMA}.$${SNOWFLAKE_TABLE} limit 10000000" \
+        )
+
+.PHONY: snowflake-poc-1-par
+snowflake-poc-1-par:  ## Run snowflake-poc-1 in Parallel
+	MODULE=snowflake-poc-1 && \
+	  rm -rf ./spark/dfs/$$MODULE && cp -r $$MODULE ./spark/dfs && \
+	  cp config.yaml ./spark/dfs/$$MODULE && \
+	(source ./snowflake-poc-1/.envrc && cd spark && source .envrc \
+	  docker-compose exec spark-client pip3 install $(PYTHON_DEPS) && \
+	  time ./docker-spark-submit \
+	    --packages net.snowflake:snowflake-jdbc:3.12.12,net.snowflake:spark-snowflake_2.12:2.8.2-spark_3.0 \
+	    $${SPARK_HOME}/dfs/$$MODULE/sfq-job.py \
+	    --parallel --debug --sleep=600 \
+	    $${SPARK_HOME}/dfs/$$MODULE/output.tsv \
+	    "select * from $${SNOWFLAKE_DATABASE}.$${SNOWFLAKE_SCHEMA}.$${SNOWFLAKE_TABLE} limit 10000000" \
+        )
 
 clean:  ## Remove all data
 	rm -rf .tmp ./cc-data/out
