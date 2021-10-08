@@ -90,3 +90,14 @@ make snowflake all
 tail logs/*
 ```
 
+
+## Useful Links
+
+* AWS Glue with Snowflake Spark Driver
+  * https://www.snowflake.com/blog/how-to-use-aws-glue-with-snowflake/
+* Parallelize Query Optimization for regular JDBC driver
+  * https://docs.databricks.com/data/data-sources/sql-databases.html#optimize-performance-when-reading-data
+* The Internal Workings of Spark-Snowflake Connector
+  * https://www.tigeranalytics.com/blog/internal-workings-spark-snowflake-connector/
+* Parallelization via JDBC - Pyspark - How does parallelization work using JDBC?
+  * https://stackoverflow.com/a/49259008/5213030
