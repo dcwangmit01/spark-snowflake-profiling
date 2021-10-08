@@ -1,6 +1,6 @@
 
 The code in this benchmark repository runs 4 implementations of a Spark job submitted to a local docker-composed Spark
-cluster.  Each implementation of the spark job queryies data from Snowflake in different ways, providing a benchmark
+cluster.  Each implementation of the spark job queries data from Snowflake in different ways, providing a benchmark
 for identifying the best method.
 
 ## TLDR
@@ -8,7 +8,7 @@ for identifying the best method.
 Using the Snowflake Spark Driver without setting any special parameters will result in a parallel data pull far
 superior to the Snowflake JDBC Driver with parallelization parameters set.  This is the best method.
 
-## Summary of methods and findings:
+## Methods and Findings
 
 ### Snowflake Spark Driver - Sequential Pull
 
@@ -16,6 +16,9 @@ superior to the Snowflake JDBC Driver with parallelization parameters set.  This
   * https://docs.snowflake.com/en/user-guide/spark-connector-use.html#sample-python-script
 * Results
   * SparkUI shows that the data pull occurs in parallel even though the code has no parallelization parameters set
+* Assessment
+  * The workload was evenly parallel and evenly distributed
+  * ![](images/snowflake-spark-sequential.jpg)
 
 
 ### Snowflake Spark Driver - Parallel Pull
@@ -28,6 +31,9 @@ superior to the Snowflake JDBC Driver with parallelization parameters set.  This
   * The results were exactly the same as using the Snowflake Spark Driver to do a Sequential Pull test.
   * SparkUI shows that the data pull occurs in parallel even though the code has no parallelization parameters set
   * The snowflake drive seems to ignore the paralleization parameters provided.
+* Assessment
+  * The workload was evenly parallel and evenly distributed
+  * ![](images/snowflake-spark-parallel.jpg)
 
 ### Snowflake JDBC Driver - Sequential Pull
 
@@ -37,6 +43,9 @@ superior to the Snowflake JDBC Driver with parallelization parameters set.  This
 * Results
   * As expected, only a single Spark worker pulled from Snowflake.
   * No parallelization occured, and this was certainly the slowest method.
+* Assessment
+  * The workload was not parallel and not distributed
+  * ![](images/snowflake-jdbc-sequential.jpg)
 
 ### Snowflake JDBC Driver - Parallel Pull
 
@@ -53,6 +62,9 @@ superior to the Snowflake JDBC Driver with parallelization parameters set.  This
     * The ordinality of the index column did not allow the load to be spread evenly across partitioned pulls, especially when using the "limit" clause.
     * Thus, even though the tasks were spread over many workers, some tasks were for a small subset of data, while one
       task downloaded nearly all of the data.
+* Assessment
+  * The workload was unevenly parallel but was indeed distributed
+  * ![](images/snowflake-jdbc-parallel.jpg)
 
 ## Configuring the benchmarks
 
