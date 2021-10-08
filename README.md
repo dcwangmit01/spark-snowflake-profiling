@@ -1,7 +1,27 @@
+# Spark Snowflake Profiling
+
+Just because we write a job in Spark doesn't mean it is automatically optimized to be parallelized and distributed.
 
 The code in this benchmark repository runs 4 implementations of a Spark job submitted to a local docker-composed Spark
-cluster.  Each implementation of the spark job queries data from Snowflake in different ways, providing a benchmark
-for identifying the best method.
+cluster.  Each implementation of the spark job queries data from Snowflake in different ways, providing a benchmark for
+identifying the best method.
+
+## Assessment Criteria
+
+The best way to understand if your spark job is optimal (i.e. parallel and distributed) is to check the Spark UI of the driver node.
+
+We want our spark jobs to look like this (parallel and distributed)
+
+![](images/stage-parallel-and-distributed.jpg)
+
+Instead of our spark jobs looking like this (non-parallel and non-distributed)
+
+![](images/stage-sequential-and-nondistributed.jpg)
+
+Sometimes, you may end up with a Spark job that looks like this (unevenly parallel and distributed), which is just as bad as the non-parallel and non-distributed case.
+
+![](images/stage-unevenlyparallel-and-distributed.jpg)
+
 
 ## TLDR
 
